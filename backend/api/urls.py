@@ -18,13 +18,31 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
+from django.db import connection
 
 def health(_):
-    return JsonResponse({"status": "ok", "app": "Outvier API", "version": "0.1"})
+    db_ok = True
+    db_error = None
+    try:
+        with connection.cursor() as cur:
+            cur.execute("SELECT 1")
+            cur.fetchone()
+    except Exception as e:
+        db_ok = False
+        db_error = str(e)[:300]
+    return JsonResponse({
+        "status": "ok",
+        "app": "Outvier API",
+        "version": "0.1",
+        "db_ok": db_ok,
+        "db_error": db_error,
+    })
 
 urlpatterns = [
     path("", health),
     path("admin/", admin.site.urls),
     path("api/auth/", include("accounts.urls")),
     path("api/", include("goals.urls")),
+    path("api/", include("notifications.urls")),
+    path("api/", include("events.urls")),
 ]
