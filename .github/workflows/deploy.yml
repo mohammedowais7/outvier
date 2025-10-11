@@ -1,0 +1,36 @@
+name: Deploy to VPS (Docker Compose)
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Copy files to VPS via SSH
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete
+          path: ./
+          remote_path: ${{ secrets.VPS_PATH }}
+          remote_host: ${{ secrets.VPS_HOST }}
+          remote_user: ${{ secrets.VPS_USER }}
+          remote_key: ${{ secrets.VPS_SSH_KEY }}
+
+      - name: Compose up (build) on VPS
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            set -euo pipefail
+            cd ${{ secrets.VPS_PATH }}
+            docker compose -f docker-compose.prod.yml --env-file backend/.env.production pull || true
+            docker compose -f docker-compose.prod.yml --env-file backend/.env.production up -d --build
+            docker system prune -f
