@@ -78,7 +78,7 @@ The iOS app is built using React Native and can be deployed to the App Store.
 ### 1. Clone the Repository
 ```bash
 git clone <repository-url>
-cd DNC-Project-9-30-25
+cd outvier
 ```
 
 ### 2. Backend Setup
