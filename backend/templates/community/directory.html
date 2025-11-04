@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Community{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Community Directory</h1>
+
+<form class="row g-2 mb-3" method="get">
+  <div class="col-sm-6">
+    <input type="text" name="search" value="{{ request.GET.search }}" placeholder="Search members..." class="form-control">
+  </div>
+  <div class="col-sm-6">
+    <input type="text" name="skills" value="{{ request.GET.skills }}" placeholder="Filter by skills (comma separated)" class="form-control">
+  </div>
+  <div class="col-12">
+    <button class="btn btn-outline-secondary">Filter</button>
+    <a class="btn btn-link" href="?">Reset</a>
+  </div>
+</form>
+
+{% if members %}
+  <div class="list-group">
+    {% for m in members %}
+      <a class="list-group-item list-group-item-action" href="/community/member/{{ m.id }}/">
+        {{ m.username }}
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-muted">No members found.</p>
+{% endif %}
+{% endblock %}

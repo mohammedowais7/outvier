@@ -1,246 +1,466 @@
-# 🧭 Outvier
+# Outvier Platform - Personal Development & Mentorship Platform
 
-Goal-tracking app with reminders, events, collaboration, and push/email hooks.
+A comprehensive personal development platform that connects mentors with mentees, facilitates goal tracking, and enables collaborative learning through intelligent matching and group creation.
 
-=======================================================================
+## 🚀 Features
 
-## 📁 Project Structure
-outvier/
-├── backend/                # Django 5 API (Postgres + Redis + Celery ready)
-├── frontend/               # Expo React Native client
-├── docker-compose.prod.yml # Caddy + Gunicorn + Postgres + Redis + Celery stack
-└── scripts/
-    └── dev.ps1             # One-shot dev startup script
+### Core Features
+- **Goal Management**: Create, track, and complete personal and professional goals
+- **Mentor-Mentee Matching**: AI-powered matching based on skills, goals, and interests
+- **Group Collaboration**: Create and manage learning groups based on shared goals
+- **Event Management**: Host and attend virtual events with Zoom integration
+- **Progress Tracking**: Comprehensive analytics and insights
+- **Email Notifications**: Automated reminders and progress updates
 
-=======================================================================
+### Advanced Features
+- **Intelligent Matching**: Algorithm-based user matching for collaboration
+- **Mentor Events**: Create events with Zoom links and participant management
+- **Group Activities**: Track group meetings, discussions, and milestones
+- **Email System**: Professional email templates and delivery tracking
+- **Mobile App**: React Native app for iOS and Android
+- **AWS Deployment**: Production-ready cloud deployment
 
-## ⚙️ Requirements
-Component | Minimum
------------|----------
-Node.js | 18+ (tested with Node 24 + npm 11)
-Python | 3.11+ (virtualenv recommended; backend/venv already exists)
-Docker + Compose | for production-style stack
-Expo Go app | install on iOS/Android for testing
+## 📱 Mobile Apps
 
-=======================================================================
+### Android APK Deployment
+The Android app is built using React Native and can be deployed as an APK for distribution.
 
-## 🧑‍💻 1. Local Development (Backend + Frontend)
+### iOS App Deployment
+The iOS app is built using React Native and can be deployed to the App Store.
 
-### Backend (Windows PowerShell)
-cd "C:\Users\polav\Desktop\VIT\Units\CapstoneProject Files\outvier\backend"
-.\venv\Scripts\Activate.ps1
+## 🛠️ Technology Stack
+
+### Backend
+- **Django 4.2.7** - Web framework
+- **Django REST Framework** - API development
+- **PostgreSQL** - Database
+- **Redis** - Caching and task queue
+- **Celery** - Background task processing
+- **AWS S3** - File storage
+- **AWS SES** - Email delivery
+- **Docker** - Containerization
+
+### Frontend (Mobile)
+- **React Native** - Cross-platform mobile development
+- **Expo** - Development platform
+- **TypeScript** - Type safety
+- **React Navigation** - Navigation
+- **Redux** - State management
+
+### Infrastructure
+- **AWS EC2** - Server hosting
+- **AWS RDS** - Database hosting
+- **AWS ElastiCache** - Redis hosting
+- **AWS S3** - File storage
+- **AWS CloudFront** - CDN
+- **Nginx** - Load balancer
+
+## 📋 Prerequisites
+
+### Development Environment
+- Python 3.11+
+- Node.js 18+
+- React Native CLI
+- Expo CLI
+- Docker (for containerization)
+- PostgreSQL 15+
+- Redis 7+
+
+### Production Environment
+- AWS Account
+- Domain name
+- SSL certificates
+- App Store Developer Account (for iOS)
+- Google Play Console Account (for Android)
+
+## 🚀 Quick Start
+
+### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd DNC-Project-9-30-25
+```
+
+### 2. Backend Setup
+```bash
+cd backend
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up environment variables
+cp env.production.example .env
+
+# Run migrations
+python manage.py makemigrations
 python manage.py migrate
-python manage.py runserver 0.0.0.0:8000
 
-Ensure ALLOWED_HOSTS in settings.py includes your LAN IP (e.g. 172.20.10.3).
+# Create superuser
+python manage.py createsuperuser
 
----
+# Start development server
+python manage.py runserver
+```
 
-### Frontend (Expo Client)
-cd "C:\Users\polav\Desktop\VIT\Units\CapstoneProject Files\outvier\frontend"
+### 3. Mobile App Setup
+```bash
+cd frontend
 
-# Detect your active LAN IP automatically
-$ip = (Get-NetIPAddress -AddressFamily IPv4 |
-  Where-Object { $_.IPAddress -notlike '127.*' -and $_.IPAddress -notlike '169.254.*' -and $_.InterfaceOperationalStatus -eq 'Up' } |
-  Sort-Object InterfaceMetric, IPAddress |
-  Select-Object -First 1 -ExpandProperty IPAddress)
-$env:EXPO_PUBLIC_API_URL = "http://$ip:8000"
-
+# Install dependencies
 npm install
-npx expo start -c
 
-Scan the QR code with Expo Go (ensure phone and PC are on the same Wi-Fi).
-Safari or Chrome on your phone should load:
-http://<PC-IP>:8000/ and return {"status":"ok"}.
+# Start Expo development server
+npx expo start
+```
 
-=======================================================================
+## 📦 Deployment
 
-## 🐳 2. Production Stack (Docker, Caddy, Postgres, Redis, Celery)
+### Backend Deployment (AWS)
 
-### Prepare Configuration
-Edit backend/.env.production:
-- Update DJANGO_SECRET_KEY
-- Update DB credentials
-- Tighten CORS/ALLOWED_HOSTS before deployment
+#### 1. Prepare Environment
+```bash
+# Copy production environment file
+cp env.production.example .env.production
 
-Optional root .env:
-DOMAIN=<your.ip>.sslip.io
-ACME_EMAIL=<you@example.com>
+# Edit environment variables
+nano .env.production
+```
 
----
+#### 2. Deploy with Docker
+```bash
+# Make deployment script executable
+chmod +x deploy.sh
 
-### Run the Stack
-cd "C:\Users\polav\Desktop\VIT\Units\CapstoneProject Files\outvier"
-docker compose -f docker-compose.prod.yml --env-file backend/.env.production up -d --build
-docker compose -f docker-compose.prod.yml ps
-curl http://localhost/
+# Run deployment
+./deploy.sh
+```
 
----
+#### 3. Manual Deployment Steps
+```bash
+# Build production images
+docker-compose -f docker-compose.production.yml build
 
-### Firewall (Windows PowerShell as Admin)
-New-NetFirewallRule -DisplayName "Outvier Caddy 80"  -Direction Inbound -LocalPort 80  -Protocol TCP -Action Allow
-New-NetFirewallRule -DisplayName "Outvier Caddy 443" -Direction Inbound -LocalPort 443 -Protocol TCP -Action Allow
+# Start services
+docker-compose -f docker-compose.production.yml up -d
 
-=======================================================================
+# Run migrations
+docker-compose -f docker-compose.production.yml exec web python manage.py migrate
 
-## 📱 3. Expo App Notes
-- EXPO_PUBLIC_API_URL overrides auto-detection.
-- If unset, Expo auto-detects the Metro host (e.g. 172.20.x.x) and tries:
-  http://host:8000 and http://host
-- Metro logs show API Base URL: http://172.20.10.3:8000 for quick verification.
+# Collect static files
+docker-compose -f docker-compose.production.yml exec web python manage.py collectstatic --noinput
+```
 
-=======================================================================
+### Android APK Deployment
 
-## ⚡ 4. Deployment Automation (GitHub Actions)
-.github/workflows/deploy.yml deploys via SSH + Docker Compose.
+#### 1. Build APK
+```bash
+cd frontend
 
-Required GitHub Secrets:
-VPS_HOST, VPS_USER, VPS_SSH_KEY, VPS_PATH, VPS_PORT
-
-Post-deploy health check:
-docker compose exec api python manage.py check
-
-=======================================================================
-
-## ⏰ 5. Celery Reminders & Notifications
-- Celery worker and beat run in Docker services (worker, beat).
-- Task goals.tasks.run_reminder_scan executes every 60 seconds.
-- Email sending uses Django’s EMAIL_HOST settings.
-- Expo push sending is stubbed. Integrate with https://expo.dev/push-notifications when ready.
-
-=======================================================================
-
-## 🧩 6. Troubleshooting
-
-Issue | Fix
-------|----
-Expo shows API Base URL http://127.0.0.1 | Set $env:EXPO_PUBLIC_API_URL="http://<PC-IP>:8000" in same shell, then npx expo start -c.
-Phone can't reach backend | Backend must run on 0.0.0.0, ensure phone+PC on same Wi-Fi, firewall allows port 8000.
-Docker migrations fail | Remove extra migrations or docker compose down -v to reset.
-Celery not available in dev | Set DISABLE_CELERY=True (default).
-Expo still uses old URL | Remove-Item Env:EXPO_PUBLIC_API_URL -ErrorAction SilentlyContinue; restart Expo with -c.
-
-=======================================================================
-
-## 🧰 7. Optional Enhancements
-- Add scripts/dev.ps1 to auto-start backend + Expo with env vars.
-- Add scripts/deploy-cloudflared.ps1 for HTTPS tunnel via Cloudflare.
-- Harden prod CORS/CSRF settings.
-- Add Expo push token registration + sending in Celery.
-
-=======================================================================
-
-## ⚖️ License
-© 2025 Outvier. Licensed under the MIT License unless otherwise noted.
-
-=======================================================================
-
-## 🚀 Example dev.ps1 (Place in scripts/dev.ps1)
-
-param(
-  [int]$Port = 8000
-)
-
-$ErrorActionPreference = "Stop"
-
-# Detect LAN IP
-$ip = (Get-NetIPAddress -AddressFamily IPv4 |
-  Where-Object { $_.IPAddress -notlike '127.*' -and $_.IPAddress -notlike '169.254.*' -and $_.InterfaceOperationalStatus -eq 'Up' } |
-  Sort-Object InterfaceMetric, IPAddress |
-  Select-Object -First 1 -ExpandProperty IPAddress)
-if (-not $ip) { throw "Could not determine LAN IP." }
-
-Write-Host "Using LAN IP: $ip"
-
-# Backend
-Push-Location "$PSScriptRoot\..\backend"
-.\venv\Scripts\Activate.ps1
-$env:DISABLE_CELERY = "True"
-python manage.py migrate
-Start-Process powershell -ArgumentList "-NoExit","-Command","cd `"$PWD`"; .\venv\Scripts\Activate.ps1; python manage.py runserver 0.0.0.0:$Port"
-Pop-Location
-
-# Frontend
-Push-Location "$PSScriptRoot\..\frontend"
-$env:EXPO_PUBLIC_API_URL = "http://$ip:$Port"
+# Install dependencies
 npm install
-npx expo start -c
-Pop-Location
 
-=======================================================================
+# Build for Android
+npx expo build:android
 
-## 🔧 Example API Base Helper (frontend/src/lib/apiBase.ts)
+# Or build locally
+npx expo run:android --variant release
+```
 
-import Constants from "expo-constants";
-import { Platform } from "react-native";
+#### 2. Generate Signed APK
+```bash
+# Generate keystore
+keytool -genkey -v -keystore outvier-release-key.keystore -alias outvier -keyalg RSA -keysize 2048 -validity 10000
 
-function getDevHost() {
-  const hostUri = (Constants as any).expoConfig?.hostUri;
-  const dbg = (Constants as any).manifest?.debuggerHost;
-  const hostPort = hostUri || dbg;
-  if (hostPort) return hostPort.split(":")[0];
-  if (Platform.OS === "android") return "10.0.2.2";
-  return "localhost";
-}
+# Build signed APK
+npx expo build:android --type apk
+```
 
-export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL
-    ? process.env.EXPO_PUBLIC_API_URL
-    : (__DEV__
-        ? `http://${getDevHost()}:8000`
-        : "https://api.outvier.example.com");
+#### 3. Distribute APK
+- Upload to Google Play Console
+- Or distribute directly via APK file
+- Use Firebase App Distribution for testing
 
-=======================================================================
+### iOS App Deployment
 
-## 🔒 backend/.env.production Example
+#### 1. Build for iOS
+```bash
+cd frontend
 
-DJANGO_SETTINGS_MODULE=config.settings_prod
-DJANGO_SECRET_KEY=change_me
-DJANGO_DEBUG=False
-ALLOWED_HOSTS=outvier.example.com
-CSRF_TRUSTED_ORIGINS=https://outvier.example.com
-CORS_ALLOWED_ORIGINS=https://outvier.example.com
-SECURE_SSL_REDIRECT=True
-DATABASE_URL=postgres://outvier:strongpass@db:5432/outvier
-REDIS_URL=redis://redis:6379/0
-EMAIL_HOST=smtp.sendgrid.net
-EMAIL_HOST_USER=apikey
-EMAIL_HOST_PASSWORD=secret
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
+# Install dependencies
+npm install
 
-=======================================================================
+# Build for iOS
+npx expo build:ios
 
-## 🩺 Health Endpoint (backend/config/urls.py)
+# Or build locally
+npx expo run:ios --configuration Release
+```
 
-from django.http import JsonResponse
+#### 2. App Store Deployment
+```bash
+# Build for App Store
+npx expo build:ios --type archive
 
-def health(_):
-    return JsonResponse({"status": "ok"})
+# Upload to App Store Connect
+# Use Xcode or Application Loader
+```
 
-urlpatterns += [path("", health), path("healthz/", health)]
+#### 3. TestFlight Distribution
+```bash
+# Build for TestFlight
+npx expo build:ios --type simulator
 
-=======================================================================
+# Upload to TestFlight for beta testing
+```
 
-## 🕒 Celery Beat Example (settings.py)
+## 🔧 Configuration
 
-TIME_ZONE = "Australia/Melbourne"
-USE_TZ = True
-CELERY_TIMEZONE = TIME_ZONE
-CELERY_BEAT_SCHEDULE = {
-    "reminder-scan": {
-        "task": "goals.tasks.run_reminder_scan",
-        "schedule": 60.0,
+### Environment Variables
+
+#### Backend (.env.production)
+```env
+# Django Settings
+SECRET_KEY=your-secret-key
+DEBUG=False
+DEPLOYMENT_ENV=production
+
+# Database
+DB_NAME=outvier_production
+DB_USER=outvier_user
+DB_PASSWORD=your-db-password
+DB_HOST=your-rds-endpoint
+
+# AWS Configuration
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+AWS_STORAGE_BUCKET_NAME=outvier-platform
+
+# Email Configuration
+EMAIL_HOST_USER=your-ses-key
+EMAIL_HOST_PASSWORD=your-ses-secret
+
+# Redis
+REDIS_URL=redis://your-redis-endpoint:6379/1
+```
+
+#### Mobile App (app.json)
+```json
+{
+  "expo": {
+    "name": "Outvier",
+    "slug": "outvier",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
     },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.outvier.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.outvier.app"
+    }
+  }
 }
+```
 
-=======================================================================
+## 📊 API Documentation
 
-## 🧠 Notes
-- Always run backend with `0.0.0.0` for device access.
-- Allow Windows Firewall for Python on port 8000.
-- Ensure phone and PC share the same Wi-Fi.
-- IP may change per network—rerun `dev.ps1` to refresh automatically.
-- Use Docker stack for stable production behavior.
+### Base URL
+- **Development**: `http://localhost:8000/api/`
+- **Production**: `https://api.outvier.com/api/`
 
-=======================================================================
+### Key Endpoints
+
+#### Authentication
+- `POST /api/auth/login/` - User login
+- `POST /api/auth/register/` - User registration
+- `POST /api/auth/logout/` - User logout
+
+#### Goals
+- `GET /api/goals/` - List user goals
+- `POST /api/goals/` - Create goal
+- `PUT /api/goals/{id}/` - Update goal
+- `POST /api/goals/{id}/update_progress/` - Update goal progress
+
+#### Mentor Events
+- `GET /api/mentor-events/` - List mentor events
+- `POST /api/mentor-events/` - Create mentor event
+- `POST /api/mentor-events/{id}/register/` - Register for event
+
+#### User Groups
+- `GET /api/user-groups/` - List user groups
+- `POST /api/user-groups/` - Create user group
+- `POST /api/user-groups/{id}/join_group/` - Join group
+
+#### Matching
+- `POST /api/user-matching/find_matches/` - Find potential matches
+- `POST /api/user-matching/create_group_from_event/` - Create group from event
+
+## 🧪 Testing
+
+### Backend Testing
+```bash
+# Run tests
+python manage.py test
+
+# Run specific app tests
+python manage.py test apps.outvier
+
+# Run with coverage
+coverage run --source='.' manage.py test
+coverage report
+```
+
+### Mobile App Testing
+```bash
+cd frontend
+
+# Run testsaa
+npm test
+
+# Run on Android emulator
+npx expo run:android
+
+# Run on iOS simulator
+npx expo run:ios
+```
+
+## 📈 Monitoring
+
+### Application Monitoring
+- **Health Check**: `https://api.outvier.com/health/`
+- **Admin Panel**: `https://api.outvier.com/admin/`
+- **API Documentation**: `https://api.outvier.com/api/docs/`
+
+### Logs
+```bash
+# View application logs
+docker-compose -f docker-compose.production.yml logs web
+
+# View Celery logs
+docker-compose -f docker-compose.production.yml logs celery
+
+# View database logs
+docker-compose -f docker-compose.production.yml logs db
+```
+
+## 🔒 Security
+
+### Production Security
+- SSL/TLS encryption
+- CSRF protection
+- XSS protection
+- SQL injection prevention
+- Rate limiting
+- Secure headers
+
+### API Security
+- JWT authentication
+- API key authentication
+- Request validation
+- Input sanitization
+
+## 📱 Mobile App Features
+
+### Core Features
+- **User Authentication**: Login/register with email
+- **Goal Management**: Create, track, and complete goals
+- **Progress Tracking**: Visual progress indicators
+- **Event Participation**: Join mentor events
+- **Group Collaboration**: Participate in learning groups
+- **Notifications**: Push notifications for updates
+
+### Advanced Features
+- **Offline Support**: Work offline with sync
+- **Dark Mode**: Theme customization
+- **Biometric Auth**: Fingerprint/Face ID login
+- **Deep Linking**: Direct navigation to content
+- **Push Notifications**: Real-time updates
+
+## 🚀 Performance Optimization
+
+### Backend Optimization
+- Database indexing
+- Query optimization
+- Caching strategies
+- CDN integration
+- Load balancing
+
+### Mobile App Optimization
+- Image optimization
+- Lazy loading
+- Code splitting
+- Bundle optimization
+- Performance monitoring
+
+## 📞 Support
+
+### Documentation
+- **API Docs**: `/api/docs/`
+- **Admin Guide**: `/admin/`
+- **Mobile App Guide**: Available in app
+
+### Contact
+- **Email**: support@outvier.com
+- **GitHub Issues**: [Repository Issues]
+- **Documentation**: [Project Wiki]
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## 📝 Changelog
+
+### Version 1.0.0
+- Initial release
+- Goal management system
+- Mentor-mentee matching
+- Group collaboration
+- Email notifications
+- Mobile app (iOS/Android)
+- AWS deployment
+
+## 🎯 Roadmap
+
+### Version 1.1.0
+- Advanced analytics
+- Video call integration
+- AI-powered insights
+- Enhanced matching algorithm
+
+### Version 1.2.0
+- Mobile app improvements
+- Offline functionality
+- Push notifications
+- Performance optimizations
+
+---
+
+**Built with ❤️ for personal development and mentorship**

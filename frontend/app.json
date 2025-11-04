@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "outvier-app",
-    "slug": "outvier-app",
-    "version": "1.0.0",
+    "name": "Outvier",
+    "slug": "outvier",
+    "version": "3.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -13,20 +13,28 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "buildNumber": "3"
     },
     "android": {
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.dnc.outvier"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "plugins": [
+      "expo-asset"
+    ],
     "extra": {
-      "apiUrl": null
+      "eas": {
+        "projectId": "64aa4d7a-e8fe-4835-8015-344dc6f3c66e"
+      }
     }
   }
 }

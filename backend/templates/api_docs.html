@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}API Documentation - Digital Nomad Council{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1>API Documentation</h1>
+        <p class="lead">Comprehensive API documentation for the Digital Nomad Council platform.</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="list-group">
+            <a href="#authentication" class="list-group-item list-group-item-action">Authentication</a>
+            <a href="#users" class="list-group-item list-group-item-action">Users</a>
+            <a href="#community" class="list-group-item list-group-item-action">Community</a>
+            <a href="#projects" class="list-group-item list-group-item-action">Projects</a>
+            <a href="#events" class="list-group-item list-group-item-action">Events</a>
+            <a href="#analytics" class="list-group-item list-group-item-action">Analytics</a>
+            <a href="#forum" class="list-group-item list-group-item-action">Forum</a>
+            <a href="#integrations" class="list-group-item list-group-item-action">Integrations</a>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div id="authentication" class="mb-5">
+            <h2>Authentication</h2>
+            <p>The API uses JWT (JSON Web Tokens) for authentication.</p>
+            
+            <h4>Register</h4>
+            <pre><code>POST /api/auth/register/
+{
+    "username": "johndoe",
+    "email": "john@example.com",
+    "password": "securepassword",
+    "password_confirm": "securepassword",
+    "first_name": "John",
+    "last_name": "Doe"
+}</code></pre>
+            
+            <h4>Login</h4>
+            <pre><code>POST /api/auth/login/
+{
+    "username": "johndoe",
+    "password": "securepassword"
+}</code></pre>
+            
+            <h4>Refresh Token</h4>
+            <pre><code>POST /api/auth/token/refresh/
+{
+    "refresh": "your_refresh_token"
+}</code></pre>
+        </div>
+        
+        <div id="users" class="mb-5">
+            <h2>Users</h2>
+            <p>User management and profile endpoints.</p>
+            
+            <h4>Get User Profile</h4>
+            <pre><code>GET /api/auth/profile/
+Authorization: Bearer your_access_token</code></pre>
+            
+            <h4>Update Profile</h4>
+            <pre><code>PUT /api/auth/profile/
+Authorization: Bearer your_access_token
+{
+    "first_name": "John",
+    "last_name": "Doe",
+    "bio": "Digital nomad and AI enthusiast"
+}</code></pre>
+        </div>
+        
+        <div id="community" class="mb-5">
+            <h2>Community</h2>
+            <p>Community features including connections, mentorships, and groups.</p>
+            
+            <h4>Get Connections</h4>
+            <pre><code>GET /api/community/connections/
+Authorization: Bearer your_access_token</code></pre>
+            
+            <h4>Create Connection</h4>
+            <pre><code>POST /api/community/connections/
+Authorization: Bearer your_access_token
+{
+    "to_user": 123,
+    "connection_type": "mentor_mentee",
+    "message": "I'd like to connect with you for mentorship"
+}</code></pre>
+        </div>
+        
+        <div id="projects" class="mb-5">
+            <h2>Projects</h2>
+            <p>Project management and collaboration features.</p>
+            
+            <h4>Get Projects</h4>
+            <pre><code>GET /api/projects/projects/
+Authorization: Bearer your_access_token</code></pre>
+            
+            <h4>Create Project</h4>
+            <pre><code>POST /api/projects/projects/
+Authorization: Bearer your_access_token
+{
+    "title": "AI Chatbot Project",
+    "description": "Building an intelligent chatbot for customer service",
+    "short_description": "AI-powered customer service chatbot",
+    "status": "planning"
+}</code></pre>
+        </div>
+        
+        <div id="events" class="mb-5">
+            <h2>Events</h2>
+            <p>Event management and registration.</p>
+            
+            <h4>Get Events</h4>
+            <pre><code>GET /api/events/events/
+Authorization: Bearer your_access_token</code></pre>
+            
+            <h4>Register for Event</h4>
+            <pre><code>POST /api/events/registrations/
+Authorization: Bearer your_access_token
+{
+    "event": 123,
+    "registration_message": "Looking forward to this event!"
+}</code></pre>
+        </div>
+        
+        <div id="analytics" class="mb-5">
+            <h2>Analytics</h2>
+            <p>Analytics and dashboard endpoints.</p>
+            
+            <h4>Get Dashboards</h4>
+            <pre><code>GET /api/analytics/dashboards/
+Authorization: Bearer your_access_token</code></pre>
+            
+            <h4>Get User Activities</h4>
+            <pre><code>GET /api/analytics/activities/
+Authorization: Bearer your_access_token</code></pre>
+        </div>
+        
+        <div id="forum" class="mb-5">
+            <h2>Forum</h2>
+            <p>Discussion forum and community interactions.</p>
+            
+            <h4>Get Forum Topics</h4>
+            <pre><code>GET /api/forum/topics/
+Authorization: Bearer your_access_token</code></pre>
+            
+            <h4>Create Topic</h4>
+            <pre><code>POST /api/forum/topics/
+Authorization: Bearer your_access_token
+{
+    "category": 1,
+    "title": "Best practices for remote work",
+    "content": "What are your top tips for staying productive while working remotely?"
+}</code></pre>
+        </div>
+        
+        <div id="integrations" class="mb-5">
+            <h2>Integrations</h2>
+            <p>Third-party integrations and sync management.</p>
+            
+            <h4>Get Integrations</h4>
+            <pre><code>GET /api/integrations/integrations/
+Authorization: Bearer your_access_token</code></pre>
+            
+            <h4>Get Sync Logs</h4>
+            <pre><code>GET /api/integrations/sync-logs/
+Authorization: Bearer your_access_token</code></pre>
+        </div>
+    </div>
+</div>
+{% endblock %}

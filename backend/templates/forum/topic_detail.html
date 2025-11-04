@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ topic.title }}{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">{{ topic.title }}</h1>
+<p class="text-muted">By {{ topic.author.username }} in {{ topic.category.name }}</p>
+
+<div class="card mb-3">
+  <div class="card-body">
+    {{ topic.content|linebreaks }}
+  </div>
+  <div class="card-footer text-muted">Created {{ topic.created_at|date:"M d, H:i" }}</div>
+</div>
+
+<h5>Posts</h5>
+{% if posts %}
+  <ul class="list-group mb-3">
+    {% for p in posts %}
+      <li class="list-group-item">
+        <div class="d-flex justify-content-between">
+          <strong>{{ p.author.username }}</strong>
+          <small class="text-muted">{{ p.created_at|date:"M d, H:i" }}</small>
+        </div>
+        <div>{{ p.content|linebreaks }}</div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="text-muted">No posts yet.</p>
+{% endif %}
+
+{% if user.is_authenticated %}
+  <form action="/forum/topic/{{ topic.id }}/post/" method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Add a post</label>
+      <textarea class="form-control" name="content" rows="5" required></textarea>
+    </div>
+    <button class="btn btn-primary" type="submit">Post</button>
+  </form>
+{% endif %}
+{% endblock %}
+
+

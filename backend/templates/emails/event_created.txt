@@ -1,0 +1,37 @@
+📅 New Event Available!
+
+Hi {{ user.first_name|default:user.username }},
+
+A new event has been created that might interest you:
+
+Event: {{ event.title }}
+Description: {{ event.short_description }}
+Type: {{ event.get_event_type_display }}
+Date: {{ event.start_date|date:"M d, Y" }}
+Time: {{ event.start_date|time:"g:i A" }}
+Duration: {{ event.start_date|timesince:event.end_date }}
+
+{% if event.is_virtual and event.virtual_meeting_url %}
+🔗 Virtual Meeting: {{ event.virtual_meeting_url }}
+{% if event.virtual_meeting_id %}
+Meeting ID: {{ event.virtual_meeting_id }}
+{% endif %}
+{% endif %}
+
+{% if not event.is_virtual and event.location %}
+📍 Location: {{ event.location }}
+{% endif %}
+
+View event details: {{ site_url }}/events/{{ event.id }}/
+
+{% if event.requires_registration %}
+Registration Required: This event requires registration. Don't miss out!
+{% endif %}
+
+We hope to see you there! This is a great opportunity to learn, network, and grow with the community.
+
+---
+This email was sent from Outvier - Your Personal Development Platform
+Visit Outvier: {{ site_url }}
+View All Events: {{ site_url }}/events/
+

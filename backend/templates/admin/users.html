@@ -1,0 +1,626 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - Users{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Users</h1>
+
+<form class="row g-2 mb-3" method="get">
+  <div class="col-sm-6"><input type="text" name="search" value="{{ request.GET.search }}" class="form-control" placeholder="Search users..."></div>
+  <div class="col-sm-2"><button class="btn btn-primary w-100" type="submit">Search</button></div>
+  <div class="col-sm-2"><a class="btn btn-outline-secondary w-100" href="?">Reset</a></div>
+  <div class="col-sm-2"><a class="btn btn-link w-100" href="/django-admin/auth/user/" target="_blank">Django Admin</a></div>
+  
+</form>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Joined</th>
+          <th>Staff</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+          <tr>
+            <td>{{ u.id }}</td>
+            <td>{{ u.username }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.date_joined|date:"Y-m-d" }}</td>
+            <td>{% if u.is_staff %}<span class="badge text-bg-success">Yes</span>{% else %}<span class="badge text-bg-secondary">No</span>{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="text-muted">No users found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer d-flex justify-content-between">
+    <div>Page {{ users.number }} of {{ users.paginator.num_pages }}</div>
+    <div>
+      {% if users.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="?page={{ users.previous_page_number }}">Prev</a>{% endif %}
+      {% if users.has_next %}<a class="btn btn-sm btn-outline-secondary" href="?page={{ users.next_page_number }}">Next</a>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% extends 'base.html' %}
+
+{% block title %}User Management - Admin Panel{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-sidebar {
+        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+        min-height: 100vh;
+        border-radius: 0 20px 20px 0;
+    }
+    
+    .admin-sidebar .nav-link {
+        color: rgba(255,255,255,0.8);
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin: 5px 10px;
+        transition: all 0.3s ease;
+        border: none;
+    }
+    
+    .admin-sidebar .nav-link:hover,
+    .admin-sidebar .nav-link.active {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        transform: translateX(5px);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        border-radius: 20px;
+        color: white;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .filter-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+    
+    .table-modern {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .table-modern thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .table-modern tbody tr {
+        border-bottom: 1px solid #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    
+    .table-modern tbody tr:hover {
+        background: #f8f9fa;
+        transform: scale(1.01);
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .badge-modern {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .btn-modern {
+        border-radius: 25px;
+        padding: 8px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .search-box {
+        border-radius: 25px;
+        border: 2px solid #e9ecef;
+        padding: 12px 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .search-box:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .filter-btn {
+        border-radius: 25px;
+        padding: 10px 25px;
+        margin: 5px;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-btn.active {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+    }
+    
+    .pagination-modern .page-link {
+        border-radius: 10px;
+        margin: 0 2px;
+        border: none;
+        color: #667eea;
+    }
+    
+    .pagination-modern .page-item.active .page-link {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border: none;
+    }
+    
+    .stats-mini {
+        background: white;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 15px;
+    }
+    
+    .stats-mini .number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+    
+    .stats-mini .label {
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Admin Sidebar -->
+        <div class="col-md-3 col-lg-2 px-0">
+            <div class="admin-sidebar">
+                <div class="p-4">
+                    <h4 class="text-white mb-4">
+                        <i class="fas fa-shield-alt me-2"></i>Admin Panel
+                    </h4>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="{% url 'admin_dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link active" href="{% url 'admin_users' %}">
+                            <i class="fas fa-users me-2"></i>Users
+                        </a>
+                        <a class="nav-link" href="{% url 'admin_projects' %}">
+                            <i class="fas fa-project-diagram me-2"></i>Projects
+                        </a>
+                        <a class="nav-link" href="{% url 'admin_events' %}">
+                            <i class="fas fa-calendar-alt me-2"></i>Events
+                        </a>
+                        <a class="nav-link" href="{% url 'admin_analytics' %}">
+                            <i class="fas fa-chart-line me-2"></i>Analytics
+                        </a>
+                        <a class="nav-link" href="{% url 'admin_content' %}">
+                            <i class="fas fa-edit me-2"></i>Content
+                        </a>
+                        <a class="nav-link" href="{% url 'admin_settings' %}">
+                            <i class="fas fa-cog me-2"></i>Settings
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <div class="p-4">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2>User Management</h2>
+                            <p class="mb-0">Manage users, roles, and permissions across the platform.</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-light btn-modern me-2">
+                                <i class="fas fa-download me-2"></i>Export
+                            </button>
+                            <button class="btn btn-light btn-modern" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                                <i class="fas fa-plus me-2"></i>Add User
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Row -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stats-mini">
+                            <div class="number">1,234</div>
+                            <div class="label">Total Users</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-mini">
+                            <div class="number">1,156</div>
+                            <div class="label">Active Users</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-mini">
+                            <div class="number">78</div>
+                            <div class="label">Pending Approval</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-mini">
+                            <div class="number">45</div>
+                            <div class="label">New This Week</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filters -->
+                <div class="filter-card">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control search-box border-0" placeholder="Search users...">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" style="border-radius: 25px;">
+                                <option>All Roles</option>
+                                <option>Admin</option>
+                                <option>Moderator</option>
+                                <option>Member</option>
+                                <option>Mentor</option>
+                                <option>Mentee</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" style="border-radius: 25px;">
+                                <option>All Status</option>
+                                <option>Active</option>
+                                <option>Inactive</option>
+                                <option>Pending</option>
+                                <option>Suspended</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <button class="btn filter-btn active">All</button>
+                            <button class="btn filter-btn">New</button>
+                            <button class="btn filter-btn">Active</button>
+                            <button class="btn filter-btn">Inactive</button>
+                            <button class="btn filter-btn">Suspended</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Users Table -->
+                <div class="table-responsive">
+                    <table class="table table-modern">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" class="form-check-input">
+                                </th>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Last Active</th>
+                                <th>Reputation</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input">
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://via.placeholder.com/40" alt="User" class="user-avatar me-3">
+                                        <div>
+                                            <div class="fw-bold">John Doe</div>
+                                            <small class="text-muted">john@example.com</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge-modern bg-primary">Member</span></td>
+                                <td><span class="badge-modern bg-success">Active</span></td>
+                                <td>Jan 15, 2024</td>
+                                <td>2 hours ago</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-star text-warning me-1"></i>
+                                        <span>245</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-outline-primary btn-sm btn-modern">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm btn-modern">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-warning btn-sm btn-modern">
+                                            <i class="fas fa-ban"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input">
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://via.placeholder.com/40" alt="User" class="user-avatar me-3">
+                                        <div>
+                                            <div class="fw-bold">Sarah Johnson</div>
+                                            <small class="text-muted">sarah@example.com</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge-modern bg-warning">Mentor</span></td>
+                                <td><span class="badge-modern bg-success">Active</span></td>
+                                <td>Dec 20, 2023</td>
+                                <td>1 day ago</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-star text-warning me-1"></i>
+                                        <span>1,234</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-outline-primary btn-sm btn-modern">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm btn-modern">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-warning btn-sm btn-modern">
+                                            <i class="fas fa-ban"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input">
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://via.placeholder.com/40" alt="User" class="user-avatar me-3">
+                                        <div>
+                                            <div class="fw-bold">Mike Chen</div>
+                                            <small class="text-muted">mike@example.com</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge-modern bg-info">Mentee</span></td>
+                                <td><span class="badge-modern bg-warning">Pending</span></td>
+                                <td>Feb 1, 2024</td>
+                                <td>Never</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-star text-warning me-1"></i>
+                                        <span>0</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-outline-success btn-sm btn-modern">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm btn-modern">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm btn-modern">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input">
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://via.placeholder.com/40" alt="User" class="user-avatar me-3">
+                                        <div>
+                                            <div class="fw-bold">Emily Davis</div>
+                                            <small class="text-muted">emily@example.com</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge-modern bg-danger">Admin</span></td>
+                                <td><span class="badge-modern bg-success">Active</span></td>
+                                <td>Nov 10, 2023</td>
+                                <td>30 minutes ago</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-star text-warning me-1"></i>
+                                        <span>2,567</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-outline-primary btn-sm btn-modern">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm btn-modern">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-warning btn-sm btn-modern">
+                                            <i class="fas fa-ban"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination pagination-modern justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1">Previous</a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" href="#">1</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">2</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">3</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Role</label>
+                            <select class="form-select">
+                                <option>Member</option>
+                                <option>Mentor</option>
+                                <option>Mentee</option>
+                                <option>Moderator</option>
+                                <option>Admin</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select">
+                                <option>Active</option>
+                                <option>Inactive</option>
+                                <option>Pending</option>
+                                <option>Suspended</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bio</label>
+                        <textarea class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Add User</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    // Search functionality
+    document.querySelector('.search-box').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.table-modern tbody tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    
+    // Bulk actions
+    document.querySelector('thead input[type="checkbox"]').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+</script>
+{% endblock %}

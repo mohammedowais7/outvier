@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Digital Nomad Council{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Hero Section -->
+        <div class="jumbotron bg-primary text-white p-5 rounded mb-5">
+            <h1 class="display-4">Welcome to Digital Nomad Council</h1>
+            <p class="lead">Join a community of aspiring digital nomads building income-generating digital assets in the AI-disrupted 21st century.</p>
+            <hr class="my-4">
+            <p>Master skills in AI, Data Science, Analytics, DevOps, and Digital Marketing.</p>
+            <a class="btn btn-light btn-lg" href="/api/auth/register/" role="button">Get Started</a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Features -->
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Community</h5>
+                <p class="card-text">Connect with like-minded individuals, find mentors, and build meaningful professional relationships.</p>
+                <a href="/api/community/" class="btn btn-primary">Explore Community</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-project-diagram fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Projects</h5>
+                <p class="card-text">Join collaborative projects, showcase your skills, and build your portfolio with real-world applications.</p>
+                <a href="/api/projects/" class="btn btn-success">Browse Projects</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                <h5 class="card-title">Analytics</h5>
+                <p class="card-text">Track your progress, analyze community engagement, and make data-driven decisions for your digital journey.</p>
+                <a href="/api/analytics/" class="btn btn-info">View Analytics</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-calendar-alt me-2"></i>Upcoming Events
+                </h5>
+                <p class="card-text">Join our webinars, workshops, and networking events to accelerate your digital nomad journey.</p>
+                <a href="/api/events/" class="btn btn-outline-primary">View Events</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-comments me-2"></i>Forum Discussions
+                </h5>
+                <p class="card-text">Participate in discussions, ask questions, and share knowledge with the community.</p>
+                <a href="/api/forum/" class="btn btn-outline-primary">Join Discussions</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Section -->
+<div class="row mt-5">
+    <div class="col-12">
+        <h3 class="text-center mb-4">Platform Statistics</h3>
+        <div class="row text-center">
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="text-primary">1,234</h4>
+                        <p class="card-text">Active Members</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="text-success">567</h4>
+                        <p class="card-text">Active Projects</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="text-info">89</h4>
+                        <p class="card-text">Mentorship Pairs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="text-warning">45</h4>
+                        <p class="card-text">Events This Month</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

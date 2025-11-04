@@ -1,1 +1,12 @@
-logs/
+env/
+venv/
+.env
+.env.production
+.env.development
+.env.staging
+.env.production.example
+.env.development.example
+.env.staging.example
+.env.production.example
+.env.development.example
+.env.staging.example

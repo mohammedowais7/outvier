@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics | Digital Nomad Council{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-1">Your Analytics</h1>
+                <p class="text-muted mb-0">Overview of your activity, projects, and events</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted">Projects Created</div>
+                            <div class="fs-3 fw-bold">{{ project_stats.total_created|default:0 }}</div>
+                        </div>
+                        <i class="fas fa-diagram-project text-primary fs-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted">Projects Participated</div>
+                            <div class="fs-3 fw-bold">{{ project_stats.total_participated|default:0 }}</div>
+                        </div>
+                        <i class="fas fa-users text-success fs-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted">Applications Submitted</div>
+                            <div class="fs-3 fw-bold">{{ project_stats.total_applications|default:0 }}</div>
+                        </div>
+                        <i class="fas fa-paper-plane text-info fs-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold">Event Stats</div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Total Registered</span>
+                        <span class="fw-semibold">{{ event_stats.total_registered|default:0 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Upcoming Events</span>
+                        <span class="fw-semibold">{{ event_stats.upcoming_events|default:0 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold">Recent Activity</div>
+                <div class="card-body">
+                    {% if activities %}
+                        <ul class="list-group list-group-flush">
+                            {% for a in activities %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-semibold">{{ a.get_activity_type_display|default:a.activity_type }}</div>
+                                    <small class="text-muted">{{ a.description|default:a.page_url }}</small>
+                                </div>
+                                <span class="badge bg-light text-dark">{{ a.created_at|timesince }} ago</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-chart-line fa-2x mb-2"></i>
+                            <div>No activity yet</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
