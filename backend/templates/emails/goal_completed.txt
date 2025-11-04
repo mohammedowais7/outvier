@@ -1,0 +1,25 @@
+🎉 Congratulations! Goal Completed!
+
+Hi {{ user.first_name|default:user.username }},
+
+🎊 Amazing Achievement! 🎊
+You've successfully completed your goal! This is a significant milestone in your personal development journey.
+
+Goal: {{ goal.title }}
+Description: {{ goal.description|truncatewords:30 }}
+Type: {{ goal.get_goal_type_display }}
+Priority: {{ goal.get_priority_display }}
+Completed: {{ goal.completed_date|date:"M d, Y" }}
+Duration: {{ goal.completed_date|timesince:goal.start_date }}
+
+✅ 100% Complete
+
+View your completed goal: {{ site_url }}/goals/{{ goal.id }}/
+
+Your dedication and hard work have paid off! Consider setting new goals to continue your growth journey.
+
+---
+This email was sent from Outvier - Your Personal Development Platform
+Visit Outvier: {{ site_url }}
+Create New Goal: {{ site_url }}/goals/create/
+

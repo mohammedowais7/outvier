@@ -1,0 +1,9 @@
+# ignore node_modules and system dirs
+node_modules
+.git
+AppData/
+*.tmp
+*.log
+*.zip
+.DS_Store
+Thumbs.db

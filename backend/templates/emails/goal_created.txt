@@ -1,0 +1,22 @@
+Goal Created Successfully!
+
+Hi {{ user.first_name|default:user.username }},
+
+Great job! You've created a new goal. Here are the details:
+
+Goal: {{ goal.title }}
+Description: {{ goal.description|truncatewords:30 }}
+Type: {{ goal.get_goal_type_display }}
+Priority: {{ goal.get_priority_display }}
+Target Date: {{ goal.target_date|date:"M d, Y" }}
+Days Remaining: {{ goal.days_remaining }}
+Progress: {{ goal.progress_percentage }}%
+
+View your goal details: {{ site_url }}/dashboard/
+
+Keep up the great work! Remember to track your progress and update your milestones regularly.
+
+---
+This email was sent from Outvier - Your Personal Development Platform
+Visit Outvier: {{ site_url }}
+Manage Notifications: {{ site_url }}/settings/notifications/

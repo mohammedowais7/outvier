@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - Digital Nomad Council{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    
+    .auth-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        width: 100%;
+        max-width: 500px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .auth-logo {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .form-floating {
+        margin-bottom: 20px;
+    }
+    
+    .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-auth {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 10px;
+        padding: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    .btn-auth:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .auth-links {
+        text-align: center;
+        margin-top: 20px;
+    }
+    
+    .auth-links a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .auth-links a:hover {
+        text-decoration: underline;
+    }
+    
+    .skills-selection {
+        margin-bottom: 20px;
+    }
+    
+    .skill-tag {
+        display: inline-block;
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 20px;
+        padding: 8px 16px;
+        margin: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .skill-tag:hover {
+        border-color: #667eea;
+        background: #f0f2ff;
+    }
+    
+    .skill-tag.selected {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+    
+    .password-strength {
+        margin-top: 10px;
+    }
+    
+    .strength-bar {
+        height: 4px;
+        background: #e9ecef;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    
+    .strength-fill {
+        height: 100%;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+    
+    .strength-weak { background: #dc3545; width: 25%; }
+    .strength-fair { background: #ffc107; width: 50%; }
+    .strength-good { background: #17a2b8; width: 75%; }
+    .strength-strong { background: #28a745; width: 100%; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">
+                <i class="fas fa-globe-americas"></i>
+            </div>
+            <h2 class="mb-0">Join DNC</h2>
+            <p class="text-muted">Create your Digital Nomad Council account</p>
+        </div>
+        
+        <form method="post" id="registerForm">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="first_name" name="first_name" placeholder="First Name" required>
+                        <label for="first_name"><i class="fas fa-user me-2"></i>First Name</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Last Name" required>
+                        <label for="last_name"><i class="fas fa-user me-2"></i>Last Name</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-floating">
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                <label for="email"><i class="fas fa-envelope me-2"></i>Email Address</label>
+            </div>
+            
+            <div class="form-floating">
+                <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                <label for="username"><i class="fas fa-at me-2"></i>Username</label>
+            </div>
+            
+            <div class="form-floating">
+                <input type="password" class="form-control" id="password1" name="password1" placeholder="Password" required>
+                <label for="password1"><i class="fas fa-lock me-2"></i>Password</label>
+                <div class="password-strength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                    <small class="text-muted" id="strengthText">Password strength</small>
+                </div>
+            </div>
+            
+            <div class="form-floating">
+                <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm Password" required>
+                <label for="password2"><i class="fas fa-lock me-2"></i>Confirm Password</label>
+            </div>
+            
+            <div class="form-floating">
+                <select class="form-control" id="user_type" name="user_type" required>
+                    <option value="">Select User Type</option>
+                    <option value="member">Community Member</option>
+                    <option value="mentor">Mentor</option>
+                    <option value="entrepreneur">Entrepreneur</option>
+                    <option value="student">Student</option>
+                </select>
+                <label for="user_type"><i class="fas fa-user-tag me-2"></i>User Type</label>
+            </div>
+            
+            <div class="skills-selection">
+                <label class="form-label"><i class="fas fa-cogs me-2"></i>Select Your Skills (Optional)</label>
+                <div class="skill-tags">
+                    <span class="skill-tag" data-skill="python">Python</span>
+                    <span class="skill-tag" data-skill="javascript">JavaScript</span>
+                    <span class="skill-tag" data-skill="ai">AI/ML</span>
+                    <span class="skill-tag" data-skill="data-science">Data Science</span>
+                    <span class="skill-tag" data-skill="devops">DevOps</span>
+                    <span class="skill-tag" data-skill="marketing">Digital Marketing</span>
+                    <span class="skill-tag" data-skill="design">UI/UX Design</span>
+                    <span class="skill-tag" data-skill="blockchain">Blockchain</span>
+                </div>
+                <input type="hidden" id="selected_skills" name="skills">
+            </div>
+            
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                <label class="form-check-label" for="terms">
+                    I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-auth">
+                <i class="fas fa-user-plus me-2"></i>Create Account
+            </button>
+        </form>
+        
+        <div class="auth-links">
+            <p class="mb-0">Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Password strength checker
+    document.getElementById('password1').addEventListener('input', function() {
+        const password = this.value;
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+        
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+        
+        strengthFill.className = 'strength-fill';
+        if (strength <= 2) {
+            strengthFill.classList.add('strength-weak');
+            strengthText.textContent = 'Weak password';
+        } else if (strength === 3) {
+            strengthFill.classList.add('strength-fair');
+            strengthText.textContent = 'Fair password';
+        } else if (strength === 4) {
+            strengthFill.classList.add('strength-good');
+            strengthText.textContent = 'Good password';
+        } else {
+            strengthFill.classList.add('strength-strong');
+            strengthText.textContent = 'Strong password';
+        }
+    });
+    
+    // Skills selection
+    const skillTags = document.querySelectorAll('.skill-tag');
+    const selectedSkillsInput = document.getElementById('selected_skills');
+    let selectedSkills = [];
+    
+    skillTags.forEach(tag => {
+        tag.addEventListener('click', function() {
+            const skill = this.dataset.skill;
+            if (this.classList.contains('selected')) {
+                this.classList.remove('selected');
+                selectedSkills = selectedSkills.filter(s => s !== skill);
+            } else {
+                this.classList.add('selected');
+                selectedSkills.push(skill);
+            }
+            selectedSkillsInput.value = selectedSkills.join(',');
+        });
+    });
+    
+    // Form validation
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        const password1 = document.getElementById('password1').value;
+        const password2 = document.getElementById('password2').value;
+        
+        if (password1 !== password2) {
+            e.preventDefault();
+            alert('Passwords do not match!');
+        }
+    });
+</script>
+{% endblock %}

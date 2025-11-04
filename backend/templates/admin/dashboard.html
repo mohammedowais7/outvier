@@ -1,0 +1,609 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Admin Dashboard</h1>
+
+<div class="row g-4">
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="display-6">{{ total_users }}</div>
+        <div class="text-muted">Total Users</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="display-6">{{ active_users }}</div>
+        <div class="text-muted">Active Users</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="display-6">{{ total_projects }}</div>
+        <div class="text-muted">Projects</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="display-6">{{ upcoming_events }}</div>
+        <div class="text-muted">Upcoming Events</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-4">
+  <a class="btn btn-outline-primary me-2" href="/admin/users/">Manage Users</a>
+  <a class="btn btn-outline-secondary" href="/admin/analytics/">View Analytics</a>
+  <a class="btn btn-link" href="/django-admin/" target="_blank">Open Django Admin</a>
+  
+</div>
+{% endblock %}
+
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Digital Nomad Council{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-sidebar {
+        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+        min-height: 100vh;
+        border-radius: 0 20px 20px 0;
+    }
+    
+    .admin-sidebar .nav-link {
+        color: rgba(255,255,255,0.8);
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin: 5px 10px;
+        transition: all 0.3s ease;
+        border: none;
+    }
+    
+    .admin-sidebar .nav-link:hover,
+    .admin-sidebar .nav-link.active {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        transform: translateX(5px);
+    }
+    
+    .admin-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        border-radius: 20px;
+        color: white;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border: none;
+        transition: transform 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stats-card .card-body {
+        padding: 25px;
+    }
+    
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    
+    .stats-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .stats-icon {
+        font-size: 3rem;
+        opacity: 0.1;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    
+    .table-modern {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .table-modern thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .table-modern tbody tr {
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .table-modern tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .badge-modern {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .btn-modern {
+        border-radius: 25px;
+        padding: 10px 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .activity-feed {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .activity-item {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .quick-action-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .quick-action-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .quick-action-card i {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+    
+    .progress-modern {
+        height: 8px;
+        border-radius: 10px;
+        background: #e9ecef;
+    }
+    
+    .progress-modern .progress-bar {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Admin Sidebar -->
+        <div class="col-md-3 col-lg-2 px-0">
+            <div class="admin-sidebar">
+                <div class="p-4">
+                    <h4 class="text-white mb-4">
+                        <i class="fas fa-shield-alt me-2"></i>Admin Panel
+                    </h4>
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="#dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="#users">
+                            <i class="fas fa-users me-2"></i>Users
+                        </a>
+                        <a class="nav-link" href="#projects">
+                            <i class="fas fa-project-diagram me-2"></i>Projects
+                        </a>
+                        <a class="nav-link" href="#events">
+                            <i class="fas fa-calendar-alt me-2"></i>Events
+                        </a>
+                        <a class="nav-link" href="#analytics">
+                            <i class="fas fa-chart-line me-2"></i>Analytics
+                        </a>
+                        <a class="nav-link" href="#content">
+                            <i class="fas fa-edit me-2"></i>Content
+                        </a>
+                        <a class="nav-link" href="#settings">
+                            <i class="fas fa-cog me-2"></i>Settings
+                        </a>
+                        <a class="nav-link" href="#reports">
+                            <i class="fas fa-file-alt me-2"></i>Reports
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <div class="p-4">
+                <!-- Admin Header -->
+                <div class="admin-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2>Admin Dashboard</h2>
+                            <p class="mb-0">Welcome back, {{ user.first_name|default:user.username }}! Here's what's happening on the platform.</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="d-flex align-items-center justify-content-end">
+                                <div class="me-3">
+                                    <h4 class="mb-0">{{ user.reputation_score }}</h4>
+                                    <small>Admin Level</small>
+                                </div>
+                                <div class="bg-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-crown text-warning fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card position-relative">
+                            <div class="card-body">
+                                <div class="stats-number text-primary">1,234</div>
+                                <div class="stats-label">Total Users</div>
+                                <i class="fas fa-users stats-icon text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card position-relative">
+                            <div class="card-body">
+                                <div class="stats-number text-success">567</div>
+                                <div class="stats-label">Active Projects</div>
+                                <i class="fas fa-project-diagram stats-icon text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card position-relative">
+                            <div class="card-body">
+                                <div class="stats-number text-info">89</div>
+                                <div class="stats-label">Events This Month</div>
+                                <i class="fas fa-calendar-alt stats-icon text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card position-relative">
+                            <div class="card-body">
+                                <div class="stats-number text-warning">45</div>
+                                <div class="stats-label">Pending Approvals</div>
+                                <i class="fas fa-clock stats-icon text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="chart-container">
+                            <h5 class="mb-3">Quick Actions</h5>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="quick-action-card">
+                                        <i class="fas fa-user-plus"></i>
+                                        <h6>Add User</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="quick-action-card">
+                                        <i class="fas fa-plus-circle"></i>
+                                        <h6>Create Project</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="quick-action-card">
+                                        <i class="fas fa-calendar-plus"></i>
+                                        <h6>Schedule Event</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="quick-action-card">
+                                        <i class="fas fa-chart-bar"></i>
+                                        <h6>View Reports</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Recent Users -->
+                    <div class="col-md-6 mb-4">
+                        <div class="chart-container">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5>Recent Users</h5>
+                                <a href="#" class="btn btn-outline-primary btn-sm">View All</a>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-modern">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Role</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold">John Doe</div>
+                                                        <small class="text-muted">john@example.com</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge-modern bg-primary">Member</span></td>
+                                            <td><span class="badge-modern bg-success">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-outline-primary btn-sm">Edit</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-success rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold">Sarah Johnson</div>
+                                                        <small class="text-muted">sarah@example.com</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge-modern bg-warning">Mentor</span></td>
+                                            <td><span class="badge-modern bg-success">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-outline-primary btn-sm">Edit</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-info rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold">Mike Chen</div>
+                                                        <small class="text-muted">mike@example.com</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge-modern bg-info">Mentee</span></td>
+                                            <td><span class="badge-modern bg-warning">Pending</span></td>
+                                            <td>
+                                                <button class="btn btn-outline-primary btn-sm">Edit</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- System Status -->
+                    <div class="col-md-6 mb-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3">System Status</h5>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Database</span>
+                                    <span class="text-success">Online</span>
+                                </div>
+                                <div class="progress progress-modern">
+                                    <div class="progress-bar" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Redis Cache</span>
+                                    <span class="text-success">Online</span>
+                                </div>
+                                <div class="progress progress-modern">
+                                    <div class="progress-bar" style="width: 95%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Email Service</span>
+                                    <span class="text-success">Online</span>
+                                </div>
+                                <div class="progress progress-modern">
+                                    <div class="progress-bar" style="width: 88%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>API Integrations</span>
+                                    <span class="text-warning">Degraded</span>
+                                </div>
+                                <div class="progress progress-modern">
+                                    <div class="progress-bar bg-warning" style="width: 65%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Activity Feed -->
+                <div class="row">
+                    <div class="col-md-8 mb-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3">Recent Activity</h5>
+                            <div class="activity-feed">
+                                <div class="activity-item">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i class="fas fa-user-plus text-primary"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">New User Registration</h6>
+                                            <p class="text-muted mb-1">John Doe registered and is pending approval</p>
+                                        </div>
+                                        <small class="text-muted">5 minutes ago</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i class="fas fa-project-diagram text-success"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">Project Created</h6>
+                                            <p class="text-muted mb-1">"AI Chatbot Development" project was created</p>
+                                        </div>
+                                        <small class="text-muted">1 hour ago</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i class="fas fa-calendar-check text-info"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">Event Completed</h6>
+                                            <p class="text-muted mb-1">"Machine Learning Workshop" ended successfully</p>
+                                        </div>
+                                        <small class="text-muted">2 hours ago</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">System Alert</h6>
+                                            <p class="text-muted mb-1">High CPU usage detected on server</p>
+                                        </div>
+                                        <small class="text-muted">3 hours ago</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pending Approvals -->
+                    <div class="col-md-4 mb-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3">Pending Approvals</h5>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>User Registrations</span>
+                                    <span class="badge-modern bg-warning">12</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Project Submissions</span>
+                                    <span class="badge-modern bg-info">8</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Event Proposals</span>
+                                    <span class="badge-modern bg-success">5</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Content Moderation</span>
+                                    <span class="badge-modern bg-danger">3</span>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-primary btn-modern w-100">
+                                    <i class="fas fa-tasks me-2"></i>Review All
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Sidebar navigation
+    document.querySelectorAll('.admin-sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.admin-sidebar .nav-link').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    // Quick action cards
+    document.querySelectorAll('.quick-action-card').forEach(card => {
+        card.addEventListener('click', function() {
+            // Add click functionality here
+            console.log('Quick action clicked:', this.querySelector('h6').textContent);
+        });
+    });
+    
+    // Real-time updates simulation
+    setInterval(function() {
+        // Update stats numbers with animation
+        const statsNumbers = document.querySelectorAll('.stats-number');
+        statsNumbers.forEach(number => {
+            const currentValue = parseInt(number.textContent.replace(/,/g, ''));
+            const newValue = currentValue + Math.floor(Math.random() * 3);
+            number.textContent = newValue.toLocaleString();
+        });
+    }, 30000); // Update every 30 seconds
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Event - {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 mb-0">{{ event.title }}</h1>
+  {% if user.is_authenticated %}
+    {% if is_registered %}
+      <span class="badge text-bg-success">Registered</span>
+    {% else %}
+      <a class="btn btn-outline-primary" href="/events/{{ event.id }}/register/">Register</a>
+    {% endif %}
+  {% endif %}
+</div>
+
+<p class="text-muted">Starts: {{ event.start_date|date:"M d, H:i" }}</p>
+<p>{{ event.description }}</p>
+
+<h5 class="mt-4">Attendees</h5>
+<ul class="list-group">
+  {% for r in attendees %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      {{ r.user.username }}
+      <small class="text-muted">{{ r.event.start_date|date:"M d" }}</small>
+    </li>
+  {% empty %}
+    <li class="list-group-item text-muted">No attendees yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
+
+

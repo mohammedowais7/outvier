@@ -1,0 +1,34 @@
+⏰ Goal Reminder
+
+Hi {{ user.first_name|default:user.username }},
+
+⏰ Reminder: 
+{% if reminder_type == 'deadline' %}
+Your goal deadline is approaching!
+{% elif reminder_type == 'milestone' %}
+Time to check on your goal milestones!
+{% else %}
+Don't forget about your goal!
+{% endif %}
+
+Goal: {{ goal.title }}
+Description: {{ goal.description|truncatewords:30 }}
+Type: {{ goal.get_goal_type_display }}
+Priority: {{ goal.get_priority_display }}
+Target Date: {{ goal.target_date|date:"M d, Y" }}
+Days Remaining: {{ goal.days_remaining }}
+Progress: {{ goal.progress_percentage }}%
+
+{% if goal.days_remaining <= 3 %}
+⚠️ URGENT: Your goal deadline is in {{ goal.days_remaining }} days! Consider updating your progress or extending the deadline if needed.
+{% endif %}
+
+Update your progress: {{ site_url }}/goals/{{ goal.id }}/
+
+Keep up the great work! Remember that consistent progress, no matter how small, leads to big achievements.
+
+---
+This email was sent from Outvier - Your Personal Development Platform
+Visit Outvier: {{ site_url }}
+Manage Notifications: {{ site_url }}/settings/notifications/
+

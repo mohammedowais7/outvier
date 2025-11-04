@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - Analytics{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Analytics</h1>
+
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">User Growth by Month</div>
+      <div class="card-body">
+        {% if user_growth %}
+          <ul class="list-group list-group-flush">
+            {% for row in user_growth %}
+              <li class="list-group-item d-flex justify-content-between"><span>Month {{ row.month }}</span> <span class="badge text-bg-primary">{{ row.count }}</span></li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted mb-0">No data.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">Projects by Status</div>
+      <div class="card-body">
+        {% if project_stats %}
+          <ul class="list-group list-group-flush">
+            {% for row in project_stats %}
+              <li class="list-group-item d-flex justify-content-between"><span>{{ row.status|title }}</span> <span class="badge text-bg-secondary">{{ row.count }}</span></li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted mb-0">No data.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% extends 'base.html' %}
+
+{% block title %}Analytics - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Admin Sidebar -->
+        <div class="col-md-3 col-lg-2 px-0">
+            <div class="admin-sidebar">
+                <div class="p-4">
+                    <h4 class="text-white mb-4">
+                        <i class="fas fa-shield-alt me-2"></i>Admin Panel
+                    </h4>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="{% url 'admin_dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="{% url 'admin_users' %}">
+                            <i class="fas fa-users me-2"></i>Users
+                        </a>
+                        <a class="nav-link" href="{% url 'admin_projects' %}">
+                            <i class="fas fa-project-diagram me-2"></i>Projects
+                        </a>
+                        <a class="nav-link" href="{% url 'admin_events' %}">
+                            <i class="fas fa-calendar-alt me-2"></i>Events
+                        </a>
+                        <a class="nav-link active" href="{% url 'admin_analytics' %}">
+                            <i class="fas fa-chart-line me-2"></i>Analytics
+                        </a>
+                        <a class="nav-link" href="{% url 'admin_content' %}">
+                            <i class="fas fa-edit me-2"></i>Content
+                        </a>
+                        <a class="nav-link" href="{% url 'admin_settings' %}">
+                            <i class="fas fa-cog me-2"></i>Settings
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <div class="p-4">
+                <!-- Page Header -->
+                <div class="admin-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2>Analytics Dashboard</h2>
+                            <p class="mb-0">Comprehensive analytics and insights for the Digital Nomad Council platform.</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-light btn-modern me-2">
+                                <i class="fas fa-download me-2"></i>Export Report
+                            </button>
+                            <button class="btn btn-light btn-modern">
+                                <i class="fas fa-cog me-2"></i>Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Key Metrics -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card position-relative">
+                            <div class="card-body">
+                                <div class="stats-number text-primary">12,456</div>
+                                <div class="stats-label">Total Page Views</div>
+                                <i class="fas fa-eye stats-icon text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card position-relative">
+                            <div class="card-body">
+                                <div class="stats-number text-success">3,234</div>
+                                <div class="stats-label">Unique Visitors</div>
+                                <i class="fas fa-users stats-icon text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card position-relative">
+                            <div class="card-body">
+                                <div class="stats-number text-info">2.1%</div>
+                                <div class="stats-label">Conversion Rate</div>
+                                <i class="fas fa-percentage stats-icon text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card position-relative">
+                            <div class="card-body">
+                                <div class="stats-number text-warning">4:32</div>
+                                <div class="stats-label">Avg. Session</div>
+                                <i class="fas fa-clock stats-icon text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Row -->
+                <div class="row mb-4">
+                    <div class="col-md-8 mb-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3">User Growth Over Time</h5>
+                            <canvas id="userGrowthChart" height="100"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3">Activity Distribution</h5>
+                            <canvas id="activityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detailed Analytics -->
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3">Top Pages</h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Page</th>
+                                            <th>Views</th>
+                                            <th>%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>/dashboard</td>
+                                            <td>2,456</td>
+                                            <td>
+                                                <div class="progress progress-modern">
+                                                    <div class="progress-bar" style="width: 85%"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>/projects</td>
+                                            <td>1,234</td>
+                                            <td>
+                                                <div class="progress progress-modern">
+                                                    <div class="progress-bar" style="width: 65%"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>/events</td>
+                                            <td>987</td>
+                                            <td>
+                                                <div class="progress progress-modern">
+                                                    <div class="progress-bar" style="width: 45%"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>/forum</td>
+                                            <td>654</td>
+                                            <td>
+                                                <div class="progress progress-modern">
+                                                    <div class="progress-bar" style="width: 30%"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3">User Engagement</h5>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Daily Active Users</span>
+                                    <span class="text-success">+12%</span>
+                                </div>
+                                <div class="progress progress-modern">
+                                    <div class="progress-bar" style="width: 78%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Project Participation</span>
+                                    <span class="text-success">+8%</span>
+                                </div>
+                                <div class="progress progress-modern">
+                                    <div class="progress-bar" style="width: 65%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Event Attendance</span>
+                                    <span class="text-info">+5%</span>
+                                </div>
+                                <div class="progress progress-modern">
+                                    <div class="progress-bar" style="width: 45%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Forum Activity</span>
+                                    <span class="text-warning">-2%</span>
+                                </div>
+                                <div class="progress progress-modern">
+                                    <div class="progress-bar bg-warning" style="width: 35%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

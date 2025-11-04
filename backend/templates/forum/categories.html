@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Forum Categories{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Forum Categories</h1>
+
+{% if categories %}
+  <div class="list-group">
+    {% for c in categories %}
+      <a class="list-group-item list-group-item-action" href="/forum/category/{{ c.id }}/">
+        {{ c.name }}
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-muted">No categories.</p>
+{% endif %}
+{% endblock %}
