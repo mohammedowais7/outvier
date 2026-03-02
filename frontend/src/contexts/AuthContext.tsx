@@ -2,9 +2,46 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { showMessage } from 'react-native-flash-message';
+import { Platform } from 'react-native';
 
 import { apiService } from '../services/api';
 import { User, LoginCredentials, RegisterData } from '../types/auth';
+
+// --- Safe Session Helpers (Updated for Web Compatibility) ---
+const storeSession = async (token: string) => {
+  try {
+    if (Platform.OS === 'web') {
+      localStorage.setItem('outvier_session', token);
+    } else {
+      await SecureStore.setItemAsync('outvier_session', token);
+    }
+  } catch (error) {
+    console.error('Failed to store session:', error);
+  }
+};
+
+const getSession = async (): Promise<string | null> => {
+  if (Platform.OS === 'web') {
+    return localStorage.getItem('outvier_session');
+  }
+  try {
+    return await SecureStore.getItemAsync('outvier_session');
+  } catch {
+    return null;
+  }
+};
+
+const removeSession = async () => {
+  try {
+    if (Platform.OS === 'web') {
+      localStorage.removeItem('outvier_session');
+    } else {
+      await SecureStore.deleteItemAsync('outvier_session');
+    }
+  } catch (error) {
+    console.error('Failed to remove session:', error);
+  }
+};
 
 interface AuthContextType {
   user: User | null;
@@ -37,25 +74,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       
-      // Check if user data exists in AsyncStorage
       const userData = await AsyncStorage.getItem('user');
-      const sessionId = await AsyncStorage.getItem('sessionId');
+      const sessionId = await AsyncStorage.getItem('sessionId') || await getSession();
       
       if (userData && sessionId) {
-        const parsedUser = JSON.parse(userData);
+        // UPDATE: Essential to set header before verification call
+        apiService.api.defaults.headers.common['Authorization'] = `Bearer ${sessionId}`;
         
-        // Verify session with backend
         try {
           const response = await apiService.get('/auth/me/');
           if (response.data) {
             setUser(response.data);
             await AsyncStorage.setItem('user', JSON.stringify(response.data));
           } else {
-            // Session invalid, clear stored data
             await clearAuthData();
           }
         } catch (error) {
-          // Session invalid, clear stored data
           await clearAuthData();
         }
       }
@@ -70,7 +104,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const clearAuthData = async () => {
     try {
       await AsyncStorage.multiRemove(['user', 'sessionId']);
-      await SecureStore.deleteItemAsync('outvier_session');
+      await removeSession();
+      // UPDATE: Clear headers on logout
+      delete apiService.api.defaults.headers.common['Authorization'];
       setUser(null);
     } catch (error) {
       console.error('Failed to clear auth data:', error);
@@ -86,12 +122,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.data && response.data.user) {
         const { user: userData, sessionid } = response.data;
         
-        // Store user data and session
         await AsyncStorage.setItem('user', JSON.stringify(userData));
         await AsyncStorage.setItem('sessionId', sessionid);
         
-        // Store session in secure store for additional security
-        await SecureStore.setItemAsync('outvier_session', sessionid);
+        await storeSession(sessionid);
+
+        // UPDATE: Crucial for immediate API calls
+        apiService.api.defaults.headers.common['Authorization'] = `Bearer ${sessionid}`;
         
         setUser(userData);
         
@@ -107,7 +144,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return false;
     } catch (error: any) {
       console.error('Login failed:', error);
-      
       const errorMessage = error.response?.data?.detail || 
                           error.response?.data?.non_field_errors?.[0] ||
                           'Login failed. Please try again.';
@@ -133,12 +169,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.data && response.data.user) {
         const { user: userData, sessionid } = response.data;
         
-        // Store user data and session
         await AsyncStorage.setItem('user', JSON.stringify(userData));
         await AsyncStorage.setItem('sessionId', sessionid);
         
-        // Store session in secure store
-        await SecureStore.setItemAsync('outvier_session', sessionid);
+        // UPDATE: Using safe storage and setting headers
+        await storeSession(sessionid);
+        apiService.api.defaults.headers.common['Authorization'] = `Bearer ${sessionid}`;
         
         setUser(userData);
         
@@ -155,11 +191,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       console.error('Registration failed:', error);
       
-      // Handle validation errors from Django
       if (error.response?.data && typeof error.response.data === 'object') {
         const errors = error.response.data;
-        
-        // Extract field-specific errors
         const fieldErrors = Object.entries(errors).map(([field, messages]: [string, any]) => {
           if (Array.isArray(messages)) {
             return `${field}: ${messages.join(', ')}`;
@@ -201,17 +234,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async (): Promise<void> => {
     try {
       setIsLoading(true);
-      
-      // Call logout endpoint
       try {
         await apiService.post('/auth/logout/');
       } catch (error) {
         console.warn('Logout API call failed:', error);
       }
-      
-      // Clear local data
       await clearAuthData();
-      
       showMessage({
         message: 'Logged out successfully',
         type: 'info',
@@ -230,7 +258,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       if (response.data) {
         const updatedUser = { ...user, ...response.data };
-        setUser(updatedUser);
+        setUser(updatedUser as User);
         await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
         
         showMessage({
@@ -245,7 +273,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return false;
     } catch (error: any) {
       console.error('Profile update failed:', error);
-      
       const errorMessage = error.response?.data?.detail || 
                           'Failed to update profile. Please try again.';
       

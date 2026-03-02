@@ -47,6 +47,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     },
   });
 
+  
+
   const onSubmit = async (data: LoginCredentials) => {
     const success = await login(data);
     if (!success) {

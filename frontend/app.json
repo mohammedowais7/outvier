@@ -29,12 +29,18 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-asset"
+      "expo-asset",
+      "expo-secure-store"
     ],
     "extra": {
+      "apiUrl": "http://13.238.194.235/api",
       "eas": {
-        "projectId": "64aa4d7a-e8fe-4835-8015-344dc6f3c66e"
+        "projectId": "4ad193d4-883e-4e2e-8f2a-c4153d69c459"
       }
-    }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "owner": "owaiswander"
   }
 }
