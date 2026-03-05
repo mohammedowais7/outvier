@@ -14,6 +14,9 @@ from .views import (
     CustomLoginView,
     UserProfileView,
     PasswordChangeView,
+    CurrentUserView,
+    LogoutView,
+    ForgotPasswordView,
 )
 
 router = DefaultRouter()
@@ -27,12 +30,15 @@ urlpatterns = [
     # Authentication
     path('register/', UserRegistrationView.as_view(), name='user-register'),
     path('login/', CustomLoginView.as_view(), name='custom-login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('me/', CurrentUserView.as_view(), name='current-user'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    
+
     # User profile
     path('profile/', UserProfileView.as_view(), name='user-profile'),
     path('change-password/', PasswordChangeView.as_view(), name='change-password'),
-    
+    path('forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
+
     # API endpoints
     path('', include(router.urls)),
 ]

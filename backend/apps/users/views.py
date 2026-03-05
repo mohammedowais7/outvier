@@ -6,6 +6,11 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.core.mail import send_mail
+from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, Skill, UserSkill, Certification, UserPreference
 from .serializers import (
@@ -193,6 +198,77 @@ class PasswordChangeView(APIView):
                 )
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CurrentUserView(APIView):
+    """
+    Returns the currently authenticated user's profile.
+    Used by the frontend to verify session on app startup.
+    GET /auth/me/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data)
+
+
+class LogoutView(APIView):
+    """
+    Logs out the current user.
+    POST /auth/logout/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data.get('refresh')
+            if refresh_token:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+        except Exception:
+            pass
+        return Response({'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
+
+
+class ForgotPasswordView(APIView):
+    """
+    Sends a password reset email to the provided address.
+    POST /auth/forgot-password/  — body: { "email": "..." }
+    Always returns 200 to prevent email enumeration.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email', '').strip()
+        if not email:
+            return Response({'detail': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
+            reset_url = f"{frontend_url}/reset-password/{uid}/{token}/"
+
+            send_mail(
+                subject='Password Reset Request',
+                message=(
+                    f"Hi {user.first_name or user.username},\n\n"
+                    f"Click the link below to reset your password:\n{reset_url}\n\n"
+                    f"If you didn't request this, please ignore this email."
+                ),
+                from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@outvier.com'),
+                recipient_list=[user.email],
+                fail_silently=True,
+            )
+        except User.DoesNotExist:
+            pass  # Don't reveal whether the email exists
+
+        return Response(
+            {'message': 'If an account with that email exists, password reset instructions have been sent.'},
+            status=status.HTTP_200_OK,
+        )
 
 
 class SkillViewSet(viewsets.ModelViewSet):

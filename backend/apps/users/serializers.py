@@ -59,17 +59,18 @@ class UserProfileSerializer(serializers.ModelSerializer):
     Serializer for user profile updates
     """
     full_name = serializers.ReadOnlyField()
-    
+
     class Meta:
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name', 'full_name',
+            'role', 'is_active', 'is_staff', 'date_joined',
             'bio', 'avatar', 'phone', 'location', 'timezone',
             'company', 'job_title', 'years_experience', 'linkedin_url',
             'github_url', 'portfolio_url', 'email_notifications',
             'sms_notifications', 'newsletter_subscription'
         ]
-        read_only_fields = ['id', 'username']
+        read_only_fields = ['id', 'username', 'role', 'is_active', 'is_staff', 'date_joined']
 
 
 class PasswordChangeSerializer(serializers.Serializer):
